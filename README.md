@@ -49,6 +49,18 @@ Open http://127.0.0.1:8000. Local CPU image editing does not need an NVIDIA GPU.
 
 The brush selection is literal, not semantic clothing detection. Only painted pixels are changed, so broad strokes produce visible patches. This is not a generative outfit editor. For true clothing replacements, use an image inpainting model on a suitable CUDA GPU; the current Codespaces workspace is CPU-only.
 
+## Real AI outfit replacement: Colab test
+
+The browser's **Brush tint** is a CPU color brush, not a dress replacement model. We added a separate [Colab SDXL inpainting notebook](notebooks/real_ai_inpaint_colab.ipynb) for an initial real AI experiment.
+
+1. Download this notebook from GitHub and upload it to Google Colab.
+2. Enable the T4 GPU if available (free GPU availability and quotas vary).
+3. Upload the original image and optionally a **Saved mask** from this studio; otherwise a small clothing segmentation model suggests a mask.
+4. Verify the mask overlay covers only intended clothes before running the model.
+5. Write a detailed outfit prompt, generate, review and download the image.
+
+The notebook downloads models, needs CUDA, and has **not yet been tested on Colab T4**. SDXL's editing accuracy, output quality and face consistency are not guaranteed. It does not connect to this app automatically.
+
 ## Optional AI generator
 
 **Requires a separate capable NVIDIA CUDA GPU host.** Install CUDA-compatible PyTorch following its official installation instructions, install the packages in requirements-ai.txt, then launch the server with AI_ENABLED=1 in the environment. First use may download many gigabytes of weights. These models have **not been validated on a real GPU** in this MVP, and their availability and licenses must be checked before use.
