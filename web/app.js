@@ -20,11 +20,12 @@ function mode(value){
     generate:"Real text-to-image requires a separate NVIDIA GPU. Codespaces CPU cannot generate AI images.",
     edit:"AI inpainting updates selected pixels only. Areas outside your mask remain unchanged.",
     pose:"Experimental image-to-image only; exact pose control and face identity are not guaranteed.",
-    recolor:"Recolor your selected area with CPU processing, preserving shading and all other pixels.",
+    recolor:"Brush tint colors ONLY painted strokes, not a complete dress. For a full dress replacement, a real GPU image-inpainting model is needed.",
     fill:"Replace only selected pixels with a solid color using the CPU.",
     erase:"Make only selected pixels transparent. This does not rebuild the hidden background."
   }[value];
   $("#submitHint").textContent=ai?"AI model is disabled without a CUDA GPU; no simulated results.":"CPU mode works without GPU or paid services.";
+  $("#submitText").textContent=ai?"Generate with AI":value==="recolor"?"Apply brush tint":value==="fill"?"Apply solid fill":"Erase selected pixels";
   $("#submit").disabled=ai&&!state.ai;
 }
 function fit(){
@@ -140,6 +141,16 @@ $("#brushBtn").onclick=()=>{state.erase=false;$("#brushBtn").classList.add("acti
 $("#eraserBtn").onclick=()=>{state.erase=true;$("#eraserBtn").classList.add("active");$("#brushBtn").classList.remove("active");};
 $("#clearMask").onclick=()=>mc.clearRect(0,0,mask.width,mask.height);
 $("#brushSize").oninput=()=>{$("#brushValue").textContent=$("#brushSize").value;};
+$("#exportMask").onclick=async()=>{
+  try{
+    const file=await selection();
+    const url=URL.createObjectURL(file);
+    const a=document.createElement("a");
+    a.href=url;a.download="imageforge-mask.png";document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    notice("Mask downloaded: white means edit, black means protect.");
+  }catch(e){notice(e.message);}
+};
 document.querySelectorAll("[data-select]").forEach(b=>b.onclick=()=>autoMask(b.dataset.select,b));
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>mode(b.dataset.mode));
 $("#refresh").onclick=refresh;

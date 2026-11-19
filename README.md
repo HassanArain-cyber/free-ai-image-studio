@@ -6,7 +6,7 @@ A responsive image editor and optional AI image generator for laptop and Android
 
 - Upload PNG/JPEG/WebP photos up to 12 MB and 16 megapixels.
 - Brush-painted selection, unpaint, brush size and clear.
-- **Recolor:** change selected colors while preserving shadows.
+- **Brush tint:** changes only painted strokes while preserving shadows. This cannot redesign a dress or automatically select garments.
 - **Fill:** replace selected pixels with a solid color.
 - **Erase:** make selected pixels transparent (not background reconstruction).
 - **Strict selective editing:** all pixels outside the mask are preserved.
@@ -44,6 +44,10 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ~~~
 
 Open http://127.0.0.1:8000. Local CPU image editing does not need an NVIDIA GPU.
+
+## Why brush tint gives patches
+
+The brush selection is literal, not semantic clothing detection. Only painted pixels are changed, so broad strokes produce visible patches. This is not a generative outfit editor. For true clothing replacements, use an image inpainting model on a suitable CUDA GPU; the current Codespaces workspace is CPU-only.
 
 ## Optional AI generator
 
