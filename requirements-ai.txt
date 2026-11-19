@@ -1,0 +1,7 @@
+-r requirements.txt
+# Install a CUDA-compatible PyTorch build separately on your NVIDIA GPU host.
+diffusers>=0.35,<0.41
+transformers>=4.44,<5
+accelerate>=1,<2
+safetensors>=0.4
+sentencepiece>=0.2

@@ -1,0 +1,15 @@
+{
+  "name": "ImageForge browser development (CPU editor)",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+  "forwardPorts": [
+    8000
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "ImageForge Studio",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postCreateCommand": "python -m venv .venv && .venv/bin/python -m pip install -r requirements-dev.txt",
+  "postStartCommand": "bash .devcontainer/start.sh"
+}

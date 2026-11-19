@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#10121c">
+  <meta name="description" content="ImageForge — private image generation and precise editing studio">
+  <title>ImageForge — Creative Studio</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <a class="brand" href="#studio"><span class="brand-icon">✧</span><span>ImageForge <small>CREATIVE WORKSPACE</small></span></a>
+    <nav aria-label="Workspace">
+      <a href="#studio" class="nav-item active"><span>✦</span> Studio</a>
+      <a href="#library" class="nav-item"><span>▤</span> Your library</a>
+      <a href="#settings" class="nav-item"><span>⚙</span> Access</a>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="engine-indicator"></span><span id="engineLabel">Checking engine...</span>
+      <p>Private workspace · No app-added watermark</p>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar"><span>My workspace <span class="dim">/ ImageForge</span></span><span class="chip">Local-first studio</span></header>
+    <section class="intro" id="studio">
+      <span class="eyebrow">THE CREATIVE STUDIO</span>
+      <h1>Bring your vision <em>to life.</em></h1>
+      <p>Generate images, refine details, and edit only the area you choose. Your original image stays intact.</p>
+    </section>
+    <div class="workspace-grid">
+      <section class="panel" aria-labelledby="createHeading">
+        <div class="panel-header"><div><span class="eyebrow">CREATE</span><h2 id="createHeading">New project</h2></div><span class="chip muted-chip">01</span></div>
+        <div class="mode-grid" role="group" aria-label="Editing method">
+          <button type="button" class="mode active" data-mode="edit" aria-pressed="true"><span class="mode-icon">✧</span>AI edit</button>
+          <button type="button" class="mode" data-mode="generate" aria-pressed="false"><span class="mode-icon">◈</span>Generate</button>
+          <button type="button" class="mode" data-mode="pose" aria-pressed="false"><span class="mode-icon">♧</span>Pose*</button>
+          <button type="button" class="mode" data-mode="recolor" aria-pressed="false"><span class="mode-icon">◉</span>Brush tint</button>
+          <button type="button" class="mode" data-mode="fill" aria-pressed="false"><span class="mode-icon">▦</span>Fill</button>
+          <button type="button" class="mode" data-mode="erase" aria-pressed="false"><span class="mode-icon">⌫</span>Erase</button>
+        </div>
+        <p id="modeHelp" class="notice">AI edit requires a CUDA GPU. Masked regions are regenerated; unselected pixels stay unchanged.</p>
+        <form id="jobForm">
+          <div id="uploadGroup">
+            <label for="upload">Original image</label>
+            <input id="upload" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="uploadHint">
+            <p id="uploadHint" class="hint">PNG, JPG or WebP · Max 12 MB, 16 megapixels</p>
+          </div>
+          <div id="selectionGroup">
+            <div class="label-line"><label>Choose where to edit</label><span class="hint">White strokes mark changes</span></div>
+            <div class="canvas-wrap" id="canvasWrap">
+              <canvas id="sourceCanvas" aria-label="Source image"></canvas>
+              <canvas id="maskCanvas" aria-label="Paint editing selection"></canvas>
+              <span id="canvasPlaceholder" class="canvas-empty">Upload an image to paint the edit area</span>
+            </div>
+            <div class="tool-row">
+              <button type="button" class="tool active" id="brushBtn" aria-pressed="true">✏ Paint</button>
+              <button type="button" class="tool" id="eraserBtn" aria-pressed="false">⌫ Unpaint</button>
+              <label class="brush-label" for="brushSize">Size <input id="brushSize" type="range" min="5" max="150" value="35"><span id="brushValue">35</span></label>
+              <button type="button" class="tool" id="clearMask">Clear</button><button type="button" class="tool" id="exportMask">Save mask</button>
+            </div>
+            <div class="tool-row auto-row">
+              <span class="hint">AI mask suggestion:</span>
+              <button type="button" class="tool" data-select="clothes">Clothes</button>
+              <button type="button" class="tool" data-select="background">Background</button>
+            </div>
+            <p class="hint">Brush tint only colors painted strokes; it cannot change a whole dress. <a href="https://github.com/HassanArain-cyber/free-ai-image-studio/blob/studio/image-editor-mvp/notebooks/real_ai_inpaint_colab.ipynb" target="_blank" rel="noopener noreferrer"><u>Try genuine AI dress editing in Colab</u></a> (GPU required, experimental).</p>
+          </div>
+          <div id="promptGroup">
+            <label for="prompt">Describe what you want</label>
+            <textarea id="prompt" rows="4" maxlength="3000" placeholder="Replace the selected jacket with a navy-blue blazer. Keep the face and surroundings unchanged."></textarea>
+          </div>
+          <div id="colorGroup" hidden>
+            <label for="color">Edit color</label>
+            <input id="color" type="color" value="#7067f6">
+          </div>
+          <details id="advanced">
+            <summary>Advanced image settings</summary>
+            <div class="controls-grid">
+              <div><label for="width">Width (generate)</label><select id="width"><option>512</option><option selected>768</option><option>1024</option></select></div>
+              <div><label for="height">Height (generate)</label><select id="height"><option>512</option><option selected>768</option><option>1024</option></select></div>
+              <div><label for="steps">Steps</label><input type="number" id="steps" min="1" max="50" value="25"></div>
+              <div><label for="strength">Change strength</label><input type="number" id="strength" min=".1" max="1" step=".05" value=".55"></div>
+              <div><label for="seed">Seed</label><input type="number" id="seed" min="0" max="2147483647" value="42"></div>
+              <div><label for="negative">Avoid</label><input id="negative" value="blurry, distorted, low quality" maxlength="1500"></div>
+            </div>
+          </details>
+          <button class="primary" type="submit" id="submit"><span id="submitText">Apply brush tint</span><span>→</span></button>
+          <p class="hint" id="submitHint">Selected areas only. The CPU editor can recolor, fill, or erase today.</p>
+        </form>
+      </section>
+      <div class="side-stack">
+        <section class="panel guidance">
+          <span class="eyebrow">EDIT WITH INTENT</span>
+          <h2>Precise changes.<br>Fewer surprises.</h2>
+          <div class="guidance-item"><span>01</span><div><strong>Upload an original</strong><p>Keep your original photo or artwork safe.</p></div></div>
+          <div class="guidance-item"><span>02</span><div><strong>Paint only the area</strong><p>Draw over clothes, background, or objects.</p></div></div>
+          <div class="guidance-item"><span>03</span><div><strong>Apply and compare</strong><p>Unselected pixels stay identical in strict edit mode.</p></div></div>
+          <p class="fineprint">*Pose is experimental image-to-image, not a precise skeleton/pose-control system yet. Exact face preservation or 100% prompt accuracy cannot be guaranteed.</p>
+        </section>
+        <section class="panel" id="settings">
+          <span class="eyebrow">PRIVATE ACCESS</span><h2>Studio access key</h2>
+          <p class="hint">Needed only when the server has APP_TOKEN configured.</p>
+          <div class="key-row"><input id="accessKey" type="password" autocomplete="off" placeholder="Access key"><button type="button" class="secondary" id="saveKey">Save</button></div>
+          <p class="hint">Key is stored in this browser tab only. Keep Codespaces forwarded ports private.</p>
+        </section>
+      </div>
+    </div>
+    <section class="panel library" id="library">
+      <div class="panel-header"><div><span class="eyebrow">YOUR CREATIONS</span><h2>Recent images</h2></div><button class="secondary" id="refresh" type="button">↻ Refresh</button></div>
+      <div id="jobs" class="jobs" aria-live="polite"><p class="empty">Loading your recent work...</p></div>
+    </section>
+    <footer>ImageForge is self-hosted. AI inference requires a suitable GPU. Strict edit mode protects unselected pixels, not every AI-generated detail.</footer>
+  </main>
+</div>
+<dialog id="previewDialog">
+  <div class="dialog-head"><strong>Result preview</strong><button type="button" class="secondary" id="closePreview">Close ✕</button></div>
+  <img id="previewImage" alt="Generated or edited image result">
+  <div class="dialog-actions"><button id="downloadPreview" class="primary" type="button">Download PNG</button></div>
+</dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
